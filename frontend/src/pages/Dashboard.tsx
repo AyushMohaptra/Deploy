@@ -3,10 +3,10 @@ import { Activity, AlertTriangle, CheckCircle, ShieldAlert } from 'lucide-react'
 
 interface ScanResult {
   id: number;
-  repository_name: str;
-  commit_sha: str;
-  status: str;
-  details: str;
+  repository_name: string;
+  commit_sha: string;
+  status: string;
+  details: string;
   created_at: string;
 }
 
