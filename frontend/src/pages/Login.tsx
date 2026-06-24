@@ -14,7 +14,8 @@ const Login: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
     setError('');
 
     const endpoint = isRegistering ? '/auth/register' : '/auth/token';
-    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    const rawUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    const baseUrl = rawUrl.replace(/\/+$/, '');
     
     try {
       let response;

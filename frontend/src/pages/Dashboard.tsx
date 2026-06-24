@@ -16,7 +16,8 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     // In a real app, use an API layer. For demo, fetch directly.
-    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    const rawUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    const baseUrl = rawUrl.replace(/\/+$/, '');
     fetch(`${baseUrl}/webhooks/scans`)
       .then(res => res.json())
       .then(data => {
