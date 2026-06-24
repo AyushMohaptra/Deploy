@@ -16,7 +16,8 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     // In a real app, use an API layer. For demo, fetch directly.
-    fetch('http://localhost:8000/webhooks/scans')
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    fetch(`${baseUrl}/webhooks/scans`)
       .then(res => res.json())
       .then(data => {
         if(Array.isArray(data)) setScans(data);
@@ -35,7 +36,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="container animate-fade-in" style={{ padding: '2rem 1.5rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 style={{ fontSize: '2rem' }}>Security Overview</h1>
           <p style={{ color: 'var(--text-secondary)' }}>Real-time DevSecOps policy enforcement metrics.</p>
