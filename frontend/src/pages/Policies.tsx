@@ -10,11 +10,23 @@ interface Policy {
   created_at: string;
 }
 
+const getTokenRole = () => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) return 'developer';
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.role || 'developer';
+  } catch (e) {
+    return 'developer';
+  }
+};
+
 const Policies: React.FC = () => {
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [newPolicy, setNewPolicy] = useState({ name: '', description: '', rego_code: '' });
+  const userRole = getTokenRole();
 
   const rawUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
   const baseUrl = rawUrl.replace(/\/+$/, '');
@@ -90,11 +102,13 @@ const Policies: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <div>
           <h1 style={{ fontSize: '2rem' }}>Security Policies</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Manage OPA Rego rules and compliance policies.</p>
+          <p style={{ color: 'var(--text-secondary)' }}>Manage OPA Rego rules and compliance policies. (Role: {userRole})</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-          <Plus size={18} style={{ marginRight: '0.5rem' }} /> Create Policy
-        </button>
+        {userRole !== 'developer' && (
+          <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+            <Plus size={18} style={{ marginRight: '0.5rem' }} /> Create Policy
+          </button>
+        )}
       </div>
 
       <div className="glass-panel stagger-1">
@@ -131,13 +145,15 @@ const Policies: React.FC = () => {
                       {new Date(policy.created_at).toLocaleDateString()}
                     </td>
                     <td style={{ textAlign: 'right' }}>
-                      <button 
-                        className="btn btn-danger" 
-                        style={{ padding: '0.4rem', background: 'transparent' }}
-                        onClick={() => handleDelete(policy.id)}
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      {userRole !== 'developer' && (
+                        <button 
+                          className="btn btn-danger" 
+                          style={{ padding: '0.4rem', background: 'transparent' }}
+                          onClick={() => handleDelete(policy.id)}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))

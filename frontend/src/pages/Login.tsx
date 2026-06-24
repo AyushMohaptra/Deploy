@@ -6,6 +6,7 @@ const Login: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState('demo@deployguard.com');
   const [password, setPassword] = useState('password123');
+  const [role, setRole] = useState('admin');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -23,7 +24,7 @@ const Login: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
         response = await fetch(`${baseUrl}${endpoint}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password, role: 'admin' })
+          body: JSON.stringify({ email, password, role })
         });
         if (response.ok) {
           setIsRegistering(false);
@@ -101,6 +102,21 @@ const Login: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
               />
             </div>
           </div>
+          {isRegistering && (
+            <div className="form-group" style={{ marginTop: '1rem' }}>
+              <label className="form-label">Role</label>
+              <select 
+                className="form-control" 
+                value={role} 
+                onChange={(e) => setRole(e.target.value)}
+                style={{ padding: '0.75rem', width: '100%', background: 'var(--bg-secondary)', border: '1px solid rgba(255,255,255,0.1)' }}
+              >
+                <option value="admin">Admin</option>
+                <option value="auditor">Auditor</option>
+                <option value="developer">Developer</option>
+              </select>
+            </div>
+          )}
           <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
             {isRegistering ? 'Register Account' : 'Sign In'}
           </button>
