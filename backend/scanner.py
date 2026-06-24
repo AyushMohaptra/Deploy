@@ -23,7 +23,8 @@ def scan_github_repo(repo_full_name: str, commit_sha: str, db: Session):
         "docker_misconfigs": 0,
         "vulnerable_packages": [],
         "secrets_details": [],
-        "docker_details": []
+        "docker_details": [],
+        "sast_details": []
     }
 
     # 1. OSV Dependency Scanning
@@ -32,9 +33,10 @@ def scan_github_repo(repo_full_name: str, commit_sha: str, db: Session):
     # 2. Dockerfile Misconfiguration Scanning
     _scan_dockerfile(repo_full_name, scan_results)
     
-    # 3. Secret Scanning (via Commit Diff)
+    # 3. Secret Scanning & Code Quality (via Commit Diff)
     if commit_sha and commit_sha != "latest" and commit_sha != "unknown-sha":
         _scan_secrets(repo_full_name, commit_sha, scan_results)
+        _scan_code_quality(repo_full_name, commit_sha, scan_results)
 
     # 4. Policy Evaluation
     db_policies = db.query(models.Policy).filter(models.Policy.is_active == True).all()
@@ -50,7 +52,8 @@ def scan_github_repo(repo_full_name: str, commit_sha: str, db: Session):
         "violation_reasons": violations,
         "vulnerable_packages": scan_results["vulnerable_packages"],
         "secrets_details": scan_results["secrets_details"],
-        "docker_details": scan_results["docker_details"]
+        "docker_details": scan_results["docker_details"],
+        "sast_details": scan_results["sast_details"]
     }
     
     _save_result(db, repo_full_name, commit_sha, status, details_dict)
@@ -122,6 +125,29 @@ def _scan_secrets(repo_full_name: str, commit_sha: str, scan_results: dict):
                     scan_results["secrets_details"].append(f"Found {len(matches)} potential '{name}' in commit diff.")
     except Exception as e:
         print(f"Error scanning secrets: {e}")
+
+def _scan_code_quality(repo_full_name: str, commit_sha: str, scan_results: dict):
+    # Fetch commit diff from GitHub API
+    api_url = f"https://api.github.com/repos/{repo_full_name}/commits/{commit_sha}"
+    headers = {"Accept": "application/vnd.github.v3.diff"}
+    try:
+        response = requests.get(api_url, headers=headers, timeout=10)
+        if response.status_code == 200:
+            diff_text = response.text
+            
+            # Simulated SAST patterns (dangerous functions)
+            sast_patterns = {
+                "Dangerous eval() usage": r"eval\s*\(",
+                "OS command injection risk": r"os\.system\s*\(",
+                "Hardcoded debug console.log": r"console\.log\s*\("
+            }
+            
+            for name, pattern in sast_patterns.items():
+                matches = re.findall(pattern, diff_text)
+                if matches:
+                    scan_results["sast_details"].append(f"SAST Warning: Found {len(matches)} instance(s) of '{name}' in commit diff.")
+    except Exception as e:
+        print(f"Error running SAST code quality scan: {e}")
 
 def _save_result(db: Session, repo_name: str, commit_sha: str, status: str, details_dict: dict):
     db_result = models.ScanResult(

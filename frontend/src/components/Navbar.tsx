@@ -17,6 +17,9 @@ const Navbar: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
           <NavLink to="/policies" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
             Policies
           </NavLink>
+          <NavLink to="/trust" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
+            Trust Center
+          </NavLink>
           <button className="btn btn-secondary" onClick={onLogout} style={{ padding: '0.5rem 1rem' }}>
             <LogOut size={16} style={{ marginRight: '0.5rem' }} /> Logout
           </button>

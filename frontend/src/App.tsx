@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import Policies from './pages/Policies';
+import TrustCenter from './pages/TrustCenter';
 import Login from './pages/Login';
 
 const App: React.FC = () => {
@@ -33,12 +34,29 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <Navbar onLogout={handleLogout} />
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/policies" element={<Policies />} />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <Navbar onLogout={handleLogout} />
+        <main style={{ flex: 1 }}>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/policies" element={<Policies />} />
+            <Route path="/trust" element={<TrustCenter />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </main>
+        
+        {/* Global Privacy Footer */}
+        <footer style={{ 
+          textAlign: 'center', 
+          padding: '1.5rem', 
+          marginTop: 'auto',
+          borderTop: '1px solid rgba(255,255,255,0.05)',
+          color: 'var(--text-secondary)',
+          fontSize: '0.9rem'
+        }}>
+          Privacy Policy: IT IS NOT A REAL PRODUCT IT IS A CAPSTONE PROJECT
+        </footer>
+      </div>
     </Router>
   );
 };
